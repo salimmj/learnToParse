@@ -65,7 +65,7 @@ class Interpreter(object):
             self.pos += 1
             return token
 
-        if current_char == '+' or current_char == '-':
+        if current_char == '+' or current_char == '-' or current_char == '*' or current_char == '/':
             token = Token(OPERAND, current_char)
             self.pos += 1
             return token
@@ -106,15 +106,21 @@ class Interpreter(object):
         while self.current_token.type == INTEGER:
             right.append(self.current_token)
             self.eat(INTEGER)
-
-        # after the above call the self.current_token is set to
-        # EOF token
-
-        # at this point INTEGER PLUS INTEGER sequence of tokens
-        # has been successfully found and the method can just
-        # return the result of adding two integers, thus
-        # effectively interpreting client input
         result = calc_result(list2digit(left), list2digit(right), op.value)
+
+        while self.current_token.type != EOF:
+            left = result
+            op = self.current_token
+            self.eat(OPERAND)
+
+            # we expect the current token to be a single-digit integer
+            right = [self.current_token]
+            self.eat(INTEGER)
+
+            while self.current_token.type == INTEGER:
+                right.append(self.current_token)
+                self.eat(INTEGER)
+            result = calc_result(left, list2digit(right), op.value)
         return result
 
 def calc_result(l, r, op):
@@ -122,6 +128,10 @@ def calc_result(l, r, op):
         return l+r
     elif op == '-':
         return l-r
+    elif op == '*':
+        return l*r
+    elif op == '/':
+        return l/r
     else:
         raise Exception("Unsupported Operand")
 def list2digit(lisst):
