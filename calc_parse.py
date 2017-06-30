@@ -30,7 +30,7 @@ class Token(object):
 class Interpreter(object):
     def __init__(self, text):
         # client string input, e.g. "3+5"
-        self.text = text
+        self.text = text.replace(' ', '')
         # self.pos is an index into self.text
         self.pos = 0
         # current token instance
